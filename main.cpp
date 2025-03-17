@@ -110,6 +110,52 @@ int PrimeCounter(int min, int max)
     return n;
 }
 
+struct RSA_KeyPair
+{
+    RSA_KeyPair(uint64_t _p, uint64_t _q)
+    {
+        p = _p;
+        q = _q;
+        n = p * q;
+
+        phiN = (p - 1) * (q - 1);
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<uint64_t> dist(0, 60000);
+
+        e = 0;
+
+        // Tilfældig valg af primtal til e
+        while (true)
+        {
+            e = dist(gen);
+
+            if (MillerRabin_CheckPrime(e, 40))
+                break;
+        }
+
+        // Beregn d. ModInverse - Kilde: https://www.geeksforgeeks.org/rsa-algorithm-cryptography/
+        for (d = 2; d < phiN; d++) 
+        {
+            if ((e * d) % phiN == 1)
+                break;
+        }
+
+
+    }
+
+    uint64_t p;
+    uint64_t q;
+
+    uint64_t e;
+    uint64_t n;
+    uint64_t d;
+
+    uint64_t phiN;
+
+};
+
 int main()
 {
    /*int check[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
@@ -130,9 +176,10 @@ int main()
         }
     }*/
 
-    std::cout << PrimeCounter(0, 100000000) << "\n";
+    RSA_KeyPair keys = RSA_KeyPair(7039, 6553);
 
-
+    std::cout << "e: " << keys.e << "\n";
+    std::cout << "d: " << keys.d << "\n";
 
     return 0;
 }
