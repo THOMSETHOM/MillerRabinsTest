@@ -1,6 +1,7 @@
 /*
 *   Ribe Katedralskole SRP 2025
 *   Skrevet af Thomas Seeberg Hansen 3.x  
+*   17/03/2025
 */
 
 #include <iostream>
@@ -47,7 +48,7 @@ bool MillerRabin_CheckPrime(uint64_t n, uint8_t rounds)
         k++;
     }
 
-    // Setup til at generere forskelige og tilfældige testværdier(a). Indenfor intervallet 1 < a < n - 2
+    // Setup til at generere forskelige og tilfældige testværdier(a). Indenfor intervallet [2, n - 2]
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<uint64_t> dist(2, n - 2);
@@ -84,9 +85,34 @@ bool MillerRabin_CheckPrime(uint64_t n, uint8_t rounds)
     return true;
 }
 
+int LowRoundsTest()
+{
+    for (int i = 0; i < 500; i++)
+    {
+        if (MillerRabin_CheckPrime(561, 1)) 
+            return i;                           // Retunere antal 'a' værdier afprøvet for at testen siger positiv for et pseudo primtal.
+    }
+
+    // -1 Retuneres hvis testen siger 561 ikke er primtal.
+    return -1;
+}
+
+int PrimeCounter(int min, int max)
+{
+    int n = 0;
+
+    for (int i = min; i < max; i++)
+    {
+        if (MillerRabin_CheckPrime(i, 40))
+            n++;
+    }
+
+    return n;
+}
+
 int main()
 {
-   int check[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
+   /*int check[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
     int c = 0;
 
     for (int i = 2; i < 1000; i++)
@@ -102,17 +128,10 @@ int main()
 
            c++;
         }
-    }
-
-    /*for (int i = 0; i < 500; i++)
-    {
-        bool a = MillerRabin_CheckPrime(561, 1);
-
-        if (a)
-            throw(-1);
-        else
-            std::cout << "SAMMENSAT";
     }*/
+
+    std::cout << PrimeCounter(0, 100000000) << "\n";
+
 
 
     return 0;
